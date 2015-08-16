@@ -1,5 +1,6 @@
 package com.nicolascarrasco.www.popular_movies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,11 +25,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
+
+    ImageGridAdapter mMovieAdapter;
 
     public MainActivityFragment() {
     }
@@ -38,7 +47,17 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+
+        View rootview = inflater.inflate(R.layout.fragment_main, container, false);
+
+        //Get the GridView by id
+        GridView gridView = (GridView) rootview.findViewById(R.id.gridview_fragment);
+
+        //Create adapter
+        mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<String>());
+        //bind adapter
+        gridView.setAdapter(mMovieAdapter);
+        return rootview;
     }
 
     // AsyncTask to fetch data from themoviedb.org API
@@ -127,6 +146,16 @@ public class MainActivityFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String[] strings) {
+            if (strings != null) {
+                mMovieAdapter.clear();
+                for (String posterPathStr : strings) {
+                    mMovieAdapter.add(posterPathStr);
+                }
+            }
+        }
+
         private String[] getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
 
@@ -177,10 +206,41 @@ public class MainActivityFragment extends Fragment {
 
                 highAndLow = formatHighLows(high, low, unitType);*/
                 resultStrs[i] = POSTER_BASE_URL + POSTER_SIZE_OPTION + posterPath;
-                Log.v(LOG_TAG, "Poster Path: " + resultStrs[i]);
+                //Log.v(LOG_TAG, "Poster Path: " + resultStrs[i]);
             }
             return resultStrs;
 
+        }
+    }
+    //Adapter for the gridView
+    //Code obtained from https://futurestud.io/blog/picasso-adapter-use-for-listview-gridview-etc/
+    public class ImageGridAdapter extends ArrayAdapter {
+        private Context context;
+        private LayoutInflater inflater;
+
+        private ArrayList<String> imageUrls;
+
+        public ImageGridAdapter(Context context, ArrayList<String> imageUrls) {
+            super(context, R.layout.grid_item_movie, imageUrls);
+
+            this.context = context;
+            this.imageUrls = imageUrls;
+
+            inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (null == convertView) {
+                convertView = inflater.inflate(R.layout.grid_item_movie, parent, false);
+            }
+
+            Picasso
+                    .with(context)
+                    .load((String) mMovieAdapter.getItem(position))
+                    .into((ImageView) convertView);
+
+            return convertView;
         }
     }
 }
