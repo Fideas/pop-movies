@@ -1,6 +1,7 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -58,6 +60,29 @@ public class MovieGridFragment extends Fragment {
         mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<Movie>());
         //bind adapter
         gridView.setAdapter(mMovieAdapter);
+        //Bind the detailed activity to the onClick action
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Movie movie = (Movie) mMovieAdapter.getItem(position);
+                //Define parameters to pass to the detailed activity
+                String title = movie.getTitle();
+                String synopsis = movie.getSynopsis();
+                String posterPath = movie.getPosterPath();
+                String rating = movie.getUserRating();
+
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                //Add data as extras to the intent
+                intent.putExtra(Intent.EXTRA_TEXT, title);
+                intent.putExtra(Intent.EXTRA_TEXT, synopsis);
+                intent.putExtra(Intent.EXTRA_TEXT, posterPath);
+                intent.putExtra(Intent.EXTRA_TEXT, rating);
+
+                startActivity(intent);
+
+            }
+        });
         return rootview;
     }
 

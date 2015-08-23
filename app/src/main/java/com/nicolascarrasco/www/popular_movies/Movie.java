@@ -31,4 +31,13 @@ public class Movie {
     public String getPosterPath() {
         return this.posterPath;
     }
+    public String getTitle() {
+        return this.title;
+    }
+    public String getSynopsis() {
+        return this.synopsis;
+    }
+    public String getUserRating() {
+        return this.userRating;
+    }
 }
