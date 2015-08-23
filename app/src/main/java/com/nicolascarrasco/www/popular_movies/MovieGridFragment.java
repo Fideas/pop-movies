@@ -30,11 +30,11 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MovieGridFragment extends Fragment {
 
     ImageGridAdapter mMovieAdapter;
 
-    public MainActivityFragment() {
+    public MovieGridFragment() {
     }
 
     @Override

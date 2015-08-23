@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">Popular-Movies</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
+    <!-- Activity names -->
+    <string name="activity_title_settings">Settings</string>
+    <!-- Strings for settings menu -->
+    <string name="sort_title">Sort By</string>
+    <string name="sort_key" translatable="false">sortBy</string>
+    <string name="sort_popular_label">Popular</string>
+    <string name="sort_popular" translatable="false">popular</string>
+    <string name="sort_highest_rated_label">Highest rated</string>
+    <string name="sort_highest_rated" translatable="false">highestRated</string>
 </resources>
