@@ -30,10 +30,14 @@ public class DetailActivityFragment extends Fragment {
         String title = intent.getStringExtra("title");
         String synopsis = intent.getStringExtra("synopsis");
         String posterPath = intent.getStringExtra("posterPath");
+        String userRating = intent.getStringExtra("userRating");
+        String releaseDate = intent.getStringExtra("releaseDate");
 
         //Add the data to the UI
         ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);
         ((TextView) rootView.findViewById(R.id.overview_text_view)).setText(synopsis);
+        ((TextView) rootView.findViewById(R.id.user_rating_text_view)).setText(userRating);
+        ((TextView) rootView.findViewById(R.id.release_year_text_view)).setText(releaseDate);
         Picasso.with(getActivity())
                 .load(posterPath)
                 .into(poster);

@@ -61,7 +61,7 @@ public class MovieGridFragment extends Fragment {
         //bind adapter
         gridView.setAdapter(mMovieAdapter);
         //Bind the detailed activity to the onClick action
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -71,6 +71,7 @@ public class MovieGridFragment extends Fragment {
                 String synopsis = movie.getSynopsis();
                 String posterPath = movie.getPosterPath();
                 String rating = movie.getUserRating();
+                String releaseDate = movie.getReleaseDate();
 
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 //Add data as extras to the intent
@@ -78,6 +79,7 @@ public class MovieGridFragment extends Fragment {
                 intent.putExtra("synopsis", synopsis);
                 intent.putExtra("posterPath", posterPath);
                 intent.putExtra("userRating", rating);
+                intent.putExtra("releaseDate", releaseDate);
 
                 startActivity(intent);
 
@@ -202,6 +204,7 @@ public class MovieGridFragment extends Fragment {
             final String TMDB_TITLE = "title";
             final String TMDB_SYNOPSIS = "overview";
             final String TMDB_RATING = "vote_average";
+            final String TMDB_RELEASE = "release_date";
 
             final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
             final String POSTER_SIZE_OPTION = "w185/";
@@ -226,6 +229,12 @@ public class MovieGridFragment extends Fragment {
                 // Get the JSON object representing a single movie
                 JSONObject movieInfo = movieArray.getJSONObject(i);
 
+                //Format the user rating before saving it
+                String userRating = formatUserRating(movieInfo.getString(TMDB_RATING));
+
+                //Format the release year before saving it
+                String releaseDate = formatReleaseDate(movieInfo.getString(TMDB_RELEASE));
+
                 //Set the parameters of the movie
                 movie.setPosterPath(POSTER_BASE_URL +
                         POSTER_SIZE_OPTION +
@@ -233,13 +242,23 @@ public class MovieGridFragment extends Fragment {
 
                 movie.setTitle(movieInfo.getString(TMDB_TITLE));
                 movie.setSynopsis(movieInfo.getString(TMDB_SYNOPSIS));
-                movie.setUserRating(movieInfo.getString(TMDB_RATING));
+                movie.setUserRating(userRating);
+                movie.setReleaseDate(releaseDate);
 
                 //Add the movie data to the result array
                 resultArray[i] = movie;
             }
             return resultArray;
+        }
 
+        private String formatUserRating(String userRating) {
+            return "User rating: "
+                    .concat(userRating
+                    .concat("/10"));
+        }
+
+        private String formatReleaseDate(String releaseDate) {
+            return releaseDate.split("-")[0];
         }
     }
 
