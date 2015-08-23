@@ -55,7 +55,7 @@ public class MovieGridFragment extends Fragment {
         GridView gridView = (GridView) rootview.findViewById(R.id.gridview_fragment);
 
         //Create adapter
-        mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<String>());
+        mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<Movie>());
         //bind adapter
         gridView.setAdapter(mMovieAdapter);
         return rootview;
@@ -89,7 +89,7 @@ public class MovieGridFragment extends Fragment {
             String sortBy;
 
             //check for the current sort parameter, if none is present use user popularity as default
-            if (params[0].equals(getString(R.string.sort_highest_rated))){
+            if (params[0].equals(getString(R.string.sort_highest_rated))) {
                 sortBy = "vote_average.desc";
             } else {
                 sortBy = "popularity.desc";
@@ -97,8 +97,8 @@ public class MovieGridFragment extends Fragment {
 
             //Attempt connection to themoviedb.org API
             try {
-            // Construct the URL for the API
-            // For full documentation please visit http://docs.themoviedb.apiary.io/
+                // Construct the URL for the API
+                // For full documentation please visit http://docs.themoviedb.apiary.io/
                 Uri builder = Uri.parse("http://api.themoviedb.org/3/discover/movie").buildUpon()
                         .appendQueryParameter(KEY_PARAM, API_KEY)
                         .appendQueryParameter(SORT_PARAM, sortBy)
@@ -163,8 +163,9 @@ public class MovieGridFragment extends Fragment {
             if (movies != null) {
                 mMovieAdapter.clear();
                 for (Movie currentMovie : movies) {
-                    String posterPathStr = currentMovie.getPosterPath();
-                    mMovieAdapter.add(posterPathStr);
+                    //String posterPathStr = currentMovie.getPosterPath();
+                    //mMovieAdapter.add(posterPathStr);
+                    mMovieAdapter.add(currentMovie);
                 }
             }
         }
@@ -211,19 +212,20 @@ public class MovieGridFragment extends Fragment {
 
         }
     }
+
     //Adapter for the gridView
     //Code obtained from https://futurestud.io/blog/picasso-adapter-use-for-listview-gridview-etc/
     public class ImageGridAdapter extends ArrayAdapter {
         private Context context;
         private LayoutInflater inflater;
 
-        private ArrayList<String> imageUrls;
+        private ArrayList<Movie> movieList;
 
-        public ImageGridAdapter(Context context, ArrayList<String> imageUrls) {
-            super(context, R.layout.grid_item_movie, imageUrls);
+        public ImageGridAdapter(Context context, ArrayList<Movie> movieList) {
+            super(context, R.layout.grid_item_movie, movieList);
 
             this.context = context;
-            this.imageUrls = imageUrls;
+            this.movieList = movieList;
 
             inflater = LayoutInflater.from(context);
         }
@@ -233,10 +235,11 @@ public class MovieGridFragment extends Fragment {
             if (null == convertView) {
                 convertView = inflater.inflate(R.layout.grid_item_movie, parent, false);
             }
-
+            //get the movie element
+            Movie movie = (Movie) mMovieAdapter.getItem(position);
             Picasso
                     .with(context)
-                    .load((String) mMovieAdapter.getItem(position))
+                    .load(movie.getPosterPath())
                     .into((ImageView) convertView);
 
             return convertView;
