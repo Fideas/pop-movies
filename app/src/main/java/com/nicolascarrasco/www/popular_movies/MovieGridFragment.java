@@ -70,7 +70,7 @@ public class MovieGridFragment extends Fragment {
     // AsyncTask to fetch data from themoviedb.org API
     // For a complete documentation on the API features visit
     // http://docs.themoviedb.apiary.io/
-    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
@@ -78,7 +78,7 @@ public class MovieGridFragment extends Fragment {
         private final String SORT_PARAM = "sort_by";
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Movie[] doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -159,16 +159,17 @@ public class MovieGridFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            if (strings != null) {
+        protected void onPostExecute(Movie[] movies) {
+            if (movies != null) {
                 mMovieAdapter.clear();
-                for (String posterPathStr : strings) {
+                for (Movie currentMovie : movies) {
+                    String posterPathStr = currentMovie.getPosterPath();
                     mMovieAdapter.add(posterPathStr);
                 }
             }
         }
 
-        private String[] getMovieDataFromJson(String movieJsonStr)
+        private Movie[] getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -189,22 +190,24 @@ public class MovieGridFragment extends Fragment {
             // asked for, which means that we need to know the GMT offset to translate this data
             // properly.
 
-            String[] resultStrs = new String[movieArray.length()];
+            Movie[] resultArray = new Movie[movieArray.length()];
 
             for (int i = 0; i < movieArray.length(); i++) {
-                // For now, using the format "Day, description, hi/low"
-                String posterPath;
-                //String description;
-                //String highAndLow;
+                // Initialize a new movie object
+                Movie movie = new Movie();
 
                 // Get the JSON object representing a single movie
                 JSONObject movieInfo = movieArray.getJSONObject(i);
 
-                // Poster path is in a child object called "poster_path".
-                posterPath = movieInfo.getString(TMDB_POSTER_PATH);
-                resultStrs[i] = POSTER_BASE_URL + POSTER_SIZE_OPTION + posterPath;
+                //Set the parameters of the movie
+                movie.setPosterPath(POSTER_BASE_URL +
+                        POSTER_SIZE_OPTION +
+                        movieInfo.getString(TMDB_POSTER_PATH));
+
+                //Add the movie data to the result array
+                resultArray[i] = movie;
             }
-            return resultStrs;
+            return resultArray;
 
         }
     }
