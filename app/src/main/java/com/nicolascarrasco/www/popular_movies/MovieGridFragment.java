@@ -100,7 +100,9 @@ public class MovieGridFragment extends Fragment {
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-        private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
+        //insert yout TMDB API key on the next line. For more information please look at the README
+        //on this repository
+        private final String API_KEY = "";
         private final String KEY_PARAM = "api_key";
         private final String SORT_PARAM = "sort_by";
 
