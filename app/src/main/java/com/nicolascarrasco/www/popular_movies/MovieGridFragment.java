@@ -1,9 +1,11 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,8 +42,7 @@ public class MovieGridFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        new FetchMoviesTask().execute();
-        //Update movie grid
+        updateMovieGrid();
     }
 
     @Override
@@ -60,10 +61,16 @@ public class MovieGridFragment extends Fragment {
         return rootview;
     }
 
+    public void updateMovieGrid() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortBy = sharedPreferences.getString(getString(R.string.sort_key), getString(R.string.sort_popular));
+        new FetchMoviesTask().execute(sortBy);
+    }
+
     // AsyncTask to fetch data from themoviedb.org API
     // For a complete documentation on the API features visit
     // http://docs.themoviedb.apiary.io/
-    public class FetchMoviesTask extends AsyncTask<Void, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
@@ -71,7 +78,7 @@ public class MovieGridFragment extends Fragment {
         private final String SORT_PARAM = "sort_by";
 
         @Override
-        protected String[] doInBackground(Void... params) {
+        protected String[] doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -79,15 +86,22 @@ public class MovieGridFragment extends Fragment {
             BufferedReader reader = null;
 
             String movieJsonStr;
+            String sortBy;
+
+            //check for the current sort parameter, if none is present use user popularity as default
+            if (params[0].equals(getString(R.string.sort_highest_rated))){
+                sortBy = "vote_average.desc";
+            } else {
+                sortBy = "popularity.desc";
+            }
 
             //Attempt connection to themoviedb.org API
             try {
             // Construct the URL for the API
-                // http://api.themoviedb.org/3/discover/movie?api_key=95dcba44aa6a13b757b7289d8ffc8ae6&sort_by=popularity.desc
-            // For full documentation
+            // For full documentation please visit http://docs.themoviedb.apiary.io/
                 Uri builder = Uri.parse("http://api.themoviedb.org/3/discover/movie").buildUpon()
                         .appendQueryParameter(KEY_PARAM, API_KEY)
-                        .appendQueryParameter(SORT_PARAM, "popularity.desc")
+                        .appendQueryParameter(SORT_PARAM, sortBy)
                         .build();
                 URL url = new URL(builder.toString());
 
@@ -118,8 +132,6 @@ public class MovieGridFragment extends Fragment {
                     return null;
                 }
                 movieJsonStr = buffer.toString();
-                //Log.v(LOG_TAG, "API answer string: " + movieJsonStr);
-
 
                 try {
                     return getMovieDataFromJson(movieJsonStr);
@@ -179,34 +191,18 @@ public class MovieGridFragment extends Fragment {
 
             String[] resultStrs = new String[movieArray.length()];
 
-            /*Check for unit type. Fetch in Celsius regardless and transform later to avoid
-            saving duplicated date*/
-            /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-                    getActivity());
-            String unitType = sharedPreferences.getString(getString(R.string.pref_units_key),
-                    getString(R.string.pref_units_metric));
-            */
             for (int i = 0; i < movieArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String posterPath;
                 //String description;
                 //String highAndLow;
 
-                // Get the JSON object representing the day
+                // Get the JSON object representing a single movie
                 JSONObject movieInfo = movieArray.getJSONObject(i);
 
                 // Poster path is in a child object called "poster_path".
                 posterPath = movieInfo.getString(TMDB_POSTER_PATH);
-
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
-                /*JSONObject temperatureObject = movieInfo.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-
-                highAndLow = formatHighLows(high, low, unitType);*/
                 resultStrs[i] = POSTER_BASE_URL + POSTER_SIZE_OPTION + posterPath;
-                //Log.v(LOG_TAG, "Poster Path: " + resultStrs[i]);
             }
             return resultStrs;
 
