@@ -163,8 +163,6 @@ public class MovieGridFragment extends Fragment {
             if (movies != null) {
                 mMovieAdapter.clear();
                 for (Movie currentMovie : movies) {
-                    //String posterPathStr = currentMovie.getPosterPath();
-                    //mMovieAdapter.add(posterPathStr);
                     mMovieAdapter.add(currentMovie);
                 }
             }
@@ -176,6 +174,9 @@ public class MovieGridFragment extends Fragment {
             // These are the names of the JSON objects that need to be extracted.
             final String TMDB_RESULT = "results";
             final String TMDB_POSTER_PATH = "poster_path";
+            final String TMDB_TITLE = "title";
+            final String TMDB_SYNOPSIS = "overview";
+            final String TMDB_RATING = "vote_average";
 
             final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
             final String POSTER_SIZE_OPTION = "w185/";
@@ -204,6 +205,10 @@ public class MovieGridFragment extends Fragment {
                 movie.setPosterPath(POSTER_BASE_URL +
                         POSTER_SIZE_OPTION +
                         movieInfo.getString(TMDB_POSTER_PATH));
+
+                movie.setTitle(movieInfo.getString(TMDB_TITLE));
+                movie.setSynopsis(movieInfo.getString(TMDB_SYNOPSIS));
+                movie.setUserRating(movieInfo.getString(TMDB_RATING));
 
                 //Add the movie data to the result array
                 resultArray[i] = movie;
