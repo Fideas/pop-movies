@@ -105,6 +105,9 @@ public class MovieGridFragment extends Fragment {
         private final String API_KEY = "";
         private final String KEY_PARAM = "api_key";
         private final String SORT_PARAM = "sort_by";
+        //Lets weed out movies with high average score but low vote count
+        private final String FILTER_PARAM = "vote_count.gte";
+        private final String FILTER_VALUE = "25";
 
         @Override
         protected Movie[] doInBackground(String... params) {
@@ -118,6 +121,7 @@ public class MovieGridFragment extends Fragment {
             String sortBy;
 
             //check for the current sort parameter, if none is present use user popularity as default
+            //Also, use the
             if (params[0].equals(getString(R.string.sort_highest_rated))) {
                 sortBy = "vote_average.desc";
             } else {
@@ -131,7 +135,9 @@ public class MovieGridFragment extends Fragment {
                 Uri builder = Uri.parse("http://api.themoviedb.org/3/discover/movie").buildUpon()
                         .appendQueryParameter(KEY_PARAM, API_KEY)
                         .appendQueryParameter(SORT_PARAM, sortBy)
+                        .appendQueryParameter(FILTER_PARAM, FILTER_VALUE)
                         .build();
+                Log.v(LOG_TAG, builder.toString());
                 URL url = new URL(builder.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
