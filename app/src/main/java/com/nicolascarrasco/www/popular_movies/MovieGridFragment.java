@@ -74,10 +74,10 @@ public class MovieGridFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 //Add data as extras to the intent
-                intent.putExtra(Intent.EXTRA_TEXT, title);
-                intent.putExtra(Intent.EXTRA_TEXT, synopsis);
-                intent.putExtra(Intent.EXTRA_TEXT, posterPath);
-                intent.putExtra(Intent.EXTRA_TEXT, rating);
+                intent.putExtra("title", title);
+                intent.putExtra("synopsis", synopsis);
+                intent.putExtra("posterPath", posterPath);
+                intent.putExtra("userRating", rating);
 
                 startActivity(intent);
 
