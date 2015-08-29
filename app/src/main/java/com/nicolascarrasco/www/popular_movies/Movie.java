@@ -1,17 +1,54 @@
 package com.nicolascarrasco.www.popular_movies;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Nicolás Carrasco on 23-08-2015.
  */
-public class Movie {
+public class Movie implements Parcelable {
+    public static final Parcelable.Creator<Movie> CREATOR
+            = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     private String title;
     private String synopsis;
     private String posterPath;
     private String userRating;
     private String releaseDate;
 
-    //Constructor
+    //Constructors
+
     public Movie() {
+    }
+
+    //From parcel
+    public Movie(Parcel in) {
+        this.title = in.readString();
+        this.synopsis = in.readString();
+        this.posterPath = in.readString();
+        this.userRating = in.readString();
+        this.releaseDate = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(title);
+        out.writeString(synopsis);
+        out.writeString(posterPath);
+        out.writeString(userRating);
+        out.writeString(releaseDate);
     }
 
     //getters & setters
