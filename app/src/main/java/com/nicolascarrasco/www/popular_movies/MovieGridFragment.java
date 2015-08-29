@@ -136,7 +136,7 @@ public class MovieGridFragment extends Fragment {
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         //insert yout TMDB API key on the next line. For more information please look at the README
         //on this repository
-        private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
+        private final String API_KEY = "";
         private final String KEY_PARAM = "api_key";
         private final String SORT_PARAM = "sort_by";
         //Lets weed out movies with high average score but low vote count
