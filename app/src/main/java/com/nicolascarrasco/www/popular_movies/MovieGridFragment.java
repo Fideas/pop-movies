@@ -277,6 +277,7 @@ public class MovieGridFragment extends Fragment {
                 String releaseDate = formatReleaseDate(movieInfo.getString(TMDB_RELEASE));
 
                 //Set the parameters of the movie
+
                 movie.setPosterPath(POSTER_BASE_URL +
                         POSTER_SIZE_OPTION +
                         movieInfo.getString(TMDB_POSTER_PATH));
@@ -327,11 +328,15 @@ public class MovieGridFragment extends Fragment {
             }
             //get the movie element
             Movie movie = (Movie) mMovieAdapter.getItem(position);
+            try {
             Picasso
                     .with(context)
                     .load(movie.getPosterPath())
                     .into((ImageView) convertView);
 
+            } catch (IllegalArgumentException e){
+                Log.e(LOG_TAG, "Malformed/Missing URL", e);
+            }
             return convertView;
         }
 
