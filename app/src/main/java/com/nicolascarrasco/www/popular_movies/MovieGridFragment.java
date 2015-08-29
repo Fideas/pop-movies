@@ -36,28 +36,38 @@ import java.util.ArrayList;
  */
 public class MovieGridFragment extends Fragment {
 
+    private static final String MOVIES_KEY = "movies_key";
+    private static final String LOG_TAG = MovieGridFragment.class.getSimpleName();
+    private static final String SORT_ORDER_KEY = "sort_order" ;
+    ;
     ImageGridAdapter mMovieAdapter;
+    String mSortOrder;
 
     public MovieGridFragment() {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        updateMovieGrid();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Get the GridView by id
         GridView gridView = (GridView) rootview.findViewById(R.id.gridview_fragment);
 
-        //Create adapter
-        mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<Movie>());
+
+        if (savedInstanceState == null) {
+            //Create adapter
+            mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<Movie>());
+            Log.v(LOG_TAG, "Entering update throught onCreateView");
+            updateMovieGrid();
+        } else {
+            //Restore the sortOrder value from the Bundle
+            mSortOrder = savedInstanceState.getString(SORT_ORDER_KEY);
+            //Restore movieList for the adapter from the Bundle
+            ArrayList<Movie> movieArrayList = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+            mMovieAdapter = new ImageGridAdapter(getActivity(), movieArrayList);
+        }
+
         //bind adapter
         gridView.setAdapter(mMovieAdapter);
         //Bind the detailed activity to the onClick action
@@ -88,10 +98,34 @@ public class MovieGridFragment extends Fragment {
         return rootview;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIES_KEY, mMovieAdapter.getMovieList());
+        outState.putString(SORT_ORDER_KEY, mSortOrder);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getSortOrder() != null && getSortOrder() != mSortOrder) {
+            Log.v(LOG_TAG, "Entering update through onResume");
+            updateMovieGrid();
+        }
+    }
+
     public void updateMovieGrid() {
+        Log.v(LOG_TAG, "Updating Movies");
+        mSortOrder = getSortOrder();
+        new FetchMoviesTask().execute(mSortOrder);
+    }
+
+    //Helper method to retrieve the current sort order from the Shared Preferences
+    public String getSortOrder() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortBy = sharedPreferences.getString(getString(R.string.sort_key), getString(R.string.sort_popular));
-        new FetchMoviesTask().execute(sortBy);
+        return sharedPreferences.getString(getString(R.string.sort_key), getString(R.string.sort_popular));
+
     }
 
     // AsyncTask to fetch data from themoviedb.org API
@@ -102,7 +136,7 @@ public class MovieGridFragment extends Fragment {
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
         //insert yout TMDB API key on the next line. For more information please look at the README
         //on this repository
-        private final String API_KEY = "";
+        private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
         private final String KEY_PARAM = "api_key";
         private final String SORT_PARAM = "sort_by";
         //Lets weed out movies with high average score but low vote count
@@ -137,7 +171,6 @@ public class MovieGridFragment extends Fragment {
                         .appendQueryParameter(SORT_PARAM, sortBy)
                         .appendQueryParameter(FILTER_PARAM, FILTER_VALUE)
                         .build();
-                Log.v(LOG_TAG, builder.toString());
                 URL url = new URL(builder.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -262,7 +295,7 @@ public class MovieGridFragment extends Fragment {
         private String formatUserRating(String userRating) {
             return "User rating: "
                     .concat(userRating
-                    .concat("/10"));
+                            .concat("/10"));
         }
 
         private String formatReleaseDate(String releaseDate) {
@@ -300,6 +333,14 @@ public class MovieGridFragment extends Fragment {
                     .into((ImageView) convertView);
 
             return convertView;
+        }
+
+        public ArrayList<Movie> getMovieList() {
+            return this.movieList;
+        }
+
+        public void setMovieList(ArrayList<Movie> movieArrayList) {
+            this.movieList = movieArrayList;
         }
     }
 }
