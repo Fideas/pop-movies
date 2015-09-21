@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by Nicolás Carrasco on 23-08-2015.
+ * A simple class to represent a Movie object as understood by theMovieDB API
  */
 public class Movie implements Parcelable {
     public static final Parcelable.Creator<Movie> CREATOR
@@ -17,6 +17,7 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+    private String id;
     private String title;
     private String synopsis;
     private String posterPath;
@@ -30,6 +31,7 @@ public class Movie implements Parcelable {
 
     //From parcel
     public Movie(Parcel in) {
+        this.id = in.readString();
         this.title = in.readString();
         this.synopsis = in.readString();
         this.posterPath = in.readString();
@@ -44,6 +46,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
+        out.writeString(id);
         out.writeString(title);
         out.writeString(synopsis);
         out.writeString(posterPath);
@@ -52,6 +55,14 @@ public class Movie implements Parcelable {
     }
 
     //getters & setters
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getPosterPath() {
         return this.posterPath;
     }
