@@ -65,6 +65,7 @@ public class MovieGridFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = (Movie) mMovieAdapter.getItem(position);
                 //Define parameters to pass to the detailed activity
+                String movieId = movie.getId();
                 String title = movie.getTitle();
                 String synopsis = movie.getSynopsis();
                 String posterPath = movie.getPosterPath();
@@ -73,6 +74,7 @@ public class MovieGridFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 //Add data as extras to the intent
+                intent.putExtra("id", movieId);
                 intent.putExtra("title", title);
                 intent.putExtra("synopsis", synopsis);
                 intent.putExtra("posterPath", posterPath);
