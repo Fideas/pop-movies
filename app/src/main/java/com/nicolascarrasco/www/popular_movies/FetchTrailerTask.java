@@ -20,7 +20,7 @@ import java.net.URL;
  */
 public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
 
-    private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
+    private final String API_KEY = "";
     private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
     private TrailerListAdapter mTrailerAdapter;
