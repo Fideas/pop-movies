@@ -23,7 +23,11 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
     private final String API_KEY = "95dcba44aa6a13b757b7289d8ffc8ae6";
     private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
+    private TrailerListAdapter mTrailerAdapter;
 
+    public FetchTrailerTask (TrailerListAdapter trailerListAdapter){
+        mTrailerAdapter = trailerListAdapter;
+    }
 
     @Override
     protected Trailer[] doInBackground(String... params) {
@@ -99,6 +103,16 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Trailer[] trailers) {
+        if (trailers != null) {
+            mTrailerAdapter.clear();
+            for (Trailer currentTrailer : trailers) {
+                mTrailerAdapter.add(currentTrailer);
+            }
+        }
     }
 
     private Trailer[] getTrailersDataFromJson(String trailerJsonString) throws JSONException {
