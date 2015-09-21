@@ -148,20 +148,16 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         final String POSTER_SIZE_OPTION = "w185/";
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
-        JSONArray movieArray = movieJson.getJSONArray(TMDB_RESULT);
+        JSONArray resultArray = movieJson.getJSONArray(TMDB_RESULT);
 
-        // OWM returns daily forecasts based upon the local time of the city that is being
-        // asked for, which means that we need to know the GMT offset to translate this data
-        // properly.
+        Movie[] moviesArray = new Movie[resultArray.length()];
 
-        Movie[] resultArray = new Movie[movieArray.length()];
-
-        for (int i = 0; i < movieArray.length(); i++) {
+        for (int i = 0; i < resultArray.length(); i++) {
             // Initialize a new movie object
             Movie movie = new Movie();
 
             // Get the JSON object representing a single movie
-            JSONObject movieInfo = movieArray.getJSONObject(i);
+            JSONObject movieInfo = resultArray.getJSONObject(i);
 
             //Format the user rating before saving it
             String userRating = formatUserRating(movieInfo.getString(TMDB_RATING));
@@ -175,16 +171,16 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
                     POSTER_SIZE_OPTION +
                     movieInfo.getString(TMDB_POSTER_PATH));
 
-            movie.setId(TMDB_ID);
+            movie.setId(movieInfo.getString(TMDB_ID));
             movie.setTitle(movieInfo.getString(TMDB_TITLE));
             movie.setSynopsis(movieInfo.getString(TMDB_SYNOPSIS));
             movie.setUserRating(userRating);
             movie.setReleaseDate(releaseDate);
 
             //Add the movie data to the result array
-            resultArray[i] = movie;
+            moviesArray[i] = movie;
         }
-        return resultArray;
+        return moviesArray;
     }
 
     private String formatUserRating(String userRating) {
