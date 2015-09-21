@@ -27,14 +27,19 @@ public class DetailActivityFragment extends Fragment {
         ImageView poster = (ImageView) rootView.findViewById(R.id.poster_image_view);
         Intent intent = getActivity().getIntent();
         //Retrieve data from the intent
+        String id = intent.getStringExtra("id");
         String title = intent.getStringExtra("title");
         String synopsis = intent.getStringExtra("synopsis");
         String posterPath = intent.getStringExtra("posterPath");
         String userRating = intent.getStringExtra("userRating");
         String releaseDate = intent.getStringExtra("releaseDate");
 
+        //Fetch trailers info
+        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask();
+        fetchTrailerTask.execute(id);
+
         //Add the data to the UI
-        ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);
+                ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);
         ((TextView) rootView.findViewById(R.id.overview_text_view)).setText(synopsis);
         ((TextView) rootView.findViewById(R.id.user_rating_text_view)).setText(userRating);
         ((TextView) rootView.findViewById(R.id.release_year_text_view)).setText(releaseDate);
