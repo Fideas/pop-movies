@@ -7,19 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
-
-    private TrailerListAdapter mListAdapter;
 
     public DetailActivityFragment() {
     }
@@ -40,13 +35,8 @@ public class DetailActivityFragment extends Fragment {
         String releaseDate = intent.getStringExtra("releaseDate");
 
         //Fetch trailers info
-        mListAdapter = new TrailerListAdapter(getActivity(), new ArrayList<Trailer>());
-        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(mListAdapter);
+        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getActivity(), rootView);
         fetchTrailerTask.execute(id);
-
-        //Bind adapter
-        ListView trailerListView = (ListView) rootView.findViewById(R.id.trailer_list_view);
-        trailerListView.setAdapter(mListAdapter);
 
         //Add the data to the UI
         ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);

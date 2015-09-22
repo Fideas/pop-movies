@@ -1,8 +1,17 @@
 package com.nicolascarrasco.www.popular_movies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,10 +32,14 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
     private final String API_KEY = "";
     private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
-    private TrailerListAdapter mTrailerAdapter;
+    private View mRootView;
+    private LayoutInflater mInflater;
+    private Context mContext;
 
-    public FetchTrailerTask (TrailerListAdapter trailerListAdapter){
-        mTrailerAdapter = trailerListAdapter;
+    public FetchTrailerTask(Context context, View rootView) {
+        mInflater = LayoutInflater.from(context);
+        mRootView = rootView;
+        mContext = context;
     }
 
     @Override
@@ -108,9 +121,26 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
     @Override
     protected void onPostExecute(Trailer[] trailers) {
         if (trailers != null) {
-            mTrailerAdapter.clear();
+            ViewGroup linearLayout = (LinearLayout) mRootView.findViewById(R.id.trailer_list_view);
             for (Trailer currentTrailer : trailers) {
-                mTrailerAdapter.add(currentTrailer);
+                View trailerView = mInflater.inflate(R.layout.list_item_trailer, linearLayout, false);
+                TextView trailerTitleTextView = (TextView) trailerView
+                        .findViewById(R.id.trailer_name_text_view);
+                ImageView trailerThumbnail = (ImageView) trailerView.findViewById(R.id.trailer_thumbnail);
+                String thumbnailPath = "http://img.youtube.com/vi/" + currentTrailer.getTrailerKey() + "/0.jpg";
+                try {
+                    Picasso
+                            .with(mContext)
+                            .load(thumbnailPath)
+                            .resize(250, 125)
+                            .centerCrop()
+                            .into(trailerThumbnail);
+
+                } catch (IllegalArgumentException e) {
+                    Log.e(LOG_TAG, "Malformed/Missing URL", e);
+                }
+                trailerTitleTextView.setText(currentTrailer.getTrailerName());
+                linearLayout.addView(trailerView);
             }
         }
     }
