@@ -38,8 +38,12 @@ public class DetailActivityFragment extends Fragment {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getActivity(), rootView);
         fetchTrailerTask.execute(id);
 
+        //Fetch reviews info
+        FetchReviewTask fetchReviewTask = new FetchReviewTask();
+        fetchReviewTask.execute(id);
+
         //Add the data to the UI
-        ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);
+                ((TextView) rootView.findViewById(R.id.title_text_view)).setText(title);
         ((TextView) rootView.findViewById(R.id.overview_text_view)).setText(synopsis);
         ((TextView) rootView.findViewById(R.id.user_rating_text_view)).setText(userRating);
         ((TextView) rootView.findViewById(R.id.release_year_text_view)).setText(releaseDate);

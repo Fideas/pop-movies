@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Nicolás Carrasco on 21-09-2015.
+ * A task to request the trailers of the movie for the DetailActivity
  */
 public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
 
