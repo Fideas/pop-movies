@@ -1,6 +1,7 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -120,14 +121,25 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
 
     @Override
     protected void onPostExecute(Trailer[] trailers) {
+
+        final String YOUTUBE_IMG_PREFIX = "http://img.youtube.com/vi/";
+        final String YOUTUBE_IMG_SUFFIX = "/0.jpg";
+
         if (trailers != null) {
             ViewGroup linearLayout = (LinearLayout) mRootView.findViewById(R.id.trailer_list_view);
             for (Trailer currentTrailer : trailers) {
-                View trailerView = mInflater.inflate(R.layout.list_item_trailer, linearLayout, false);
+                View trailerView = mInflater.inflate(
+                        R.layout.list_item_trailer,
+                        linearLayout,
+                        false
+                );
                 TextView trailerTitleTextView = (TextView) trailerView
                         .findViewById(R.id.trailer_name_text_view);
-                ImageView trailerThumbnail = (ImageView) trailerView.findViewById(R.id.trailer_thumbnail);
-                String thumbnailPath = "http://img.youtube.com/vi/" + currentTrailer.getTrailerKey() + "/0.jpg";
+                ImageView trailerThumbnail = (ImageView) trailerView
+                        .findViewById(R.id.trailer_thumbnail);
+
+                String thumbnailPath = YOUTUBE_IMG_PREFIX + currentTrailer.getTrailerKey()
+                        + YOUTUBE_IMG_SUFFIX;
                 try {
                     Picasso
                             .with(mContext)
@@ -140,6 +152,10 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
                     Log.e(LOG_TAG, "Malformed/Missing URL", e);
                 }
                 trailerTitleTextView.setText(currentTrailer.getTrailerName());
+                //Add a ClickListener to the whole thing
+                trailerView.setOnClickListener(
+                        new TrailerOnClickListener(currentTrailer.getTrailerKey())
+                );
                 linearLayout.addView(trailerView);
             }
         }
@@ -169,5 +185,29 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
             }
         }
         return trailerArray;
+    }
+
+    public class TrailerOnClickListener implements View.OnClickListener {
+
+        private String mTrailerKey;
+
+        public TrailerOnClickListener (String trailerKey){
+            mTrailerKey = trailerKey;
+        }
+
+        @Override
+        public void onClick(View view) {
+            //Throw a video intent with the youtube's link to the video
+            final String YOUTUBE_PATH = "https://www.youtube.com/watch";
+            final String  VIDEO_PARAM = "v";
+
+            Uri uri = Uri.parse(YOUTUBE_PATH)
+                    .buildUpon()
+                    .appendQueryParameter(VIDEO_PARAM, mTrailerKey)
+                    .build();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            mContext.startActivity(intent);
+        }
     }
 }
