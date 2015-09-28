@@ -1,9 +1,12 @@
 <resources>
+
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
+    <string name="favorite_button_text">Favorite</string>
     <!-- Activity names -->
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_detail">Movie Details</string>
+
     <!-- Strings for settings menu -->
     <string name="sort_title">Sort By</string>
     <string name="sort_key" translatable="false">sortBy</string>
@@ -11,4 +14,6 @@
     <string name="sort_popular" translatable="false">popular</string>
     <string name="sort_highest_rated_label">Highest rated</string>
     <string name="sort_highest_rated" translatable="false">highestRated</string>
+
+
 </resources>
