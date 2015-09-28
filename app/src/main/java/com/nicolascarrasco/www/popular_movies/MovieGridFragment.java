@@ -1,7 +1,6 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -72,16 +71,19 @@ public class MovieGridFragment extends Fragment {
                 String rating = movie.getUserRating();
                 String releaseDate = movie.getReleaseDate();
 
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                //Add data as extras to the intent
-                intent.putExtra("id", movieId);
-                intent.putExtra("title", title);
-                intent.putExtra("synopsis", synopsis);
-                intent.putExtra("posterPath", posterPath);
-                intent.putExtra("userRating", rating);
-                intent.putExtra("releaseDate", releaseDate);
+                ((Callback) getActivity()).onItemSelected(movieId, title, synopsis, posterPath,
+                        rating, releaseDate);
 
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), DetailActivity.class);
+//                //Add data as extras to the intent
+//                intent.putExtra("id", movieId);
+//                intent.putExtra("title", title);
+//                intent.putExtra("synopsis", synopsis);
+//                intent.putExtra("posterPath", posterPath);
+//                intent.putExtra("userRating", rating);
+//                intent.putExtra("releaseDate", releaseDate);
+//
+//                startActivity(intent);
 
             }
         });
@@ -100,7 +102,6 @@ public class MovieGridFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (getSortOrder() != null && getSortOrder() != mSortOrder) {
-            Log.v(LOG_TAG, "Entering update through onResume");
             updateMovieGrid();
         }
     }
@@ -161,5 +162,11 @@ public class MovieGridFragment extends Fragment {
         public void setMovieList(ArrayList<Movie> movieArrayList) {
             this.movieList = movieArrayList;
         }
+    }
+
+    public interface Callback {
+
+        public void onItemSelected(String movieId, String title, String synopsis, String posterPath,
+                                   String userRating, String releaseDate);
     }
 }

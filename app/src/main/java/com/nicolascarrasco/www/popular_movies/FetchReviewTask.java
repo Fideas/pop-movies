@@ -26,6 +26,8 @@ import java.net.URL;
  */
 public class FetchReviewTask extends AsyncTask<String, Void, Review[]> {
 
+    //insert yout TMDB API key on the next line. For more information please look at the README
+    //on this repository
     private final String API_KEY = "";
     private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
