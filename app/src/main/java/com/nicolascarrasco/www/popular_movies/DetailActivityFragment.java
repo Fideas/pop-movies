@@ -39,7 +39,7 @@ public class DetailActivityFragment extends Fragment {
         fetchTrailerTask.execute(id);
 
         //Fetch reviews info
-        FetchReviewTask fetchReviewTask = new FetchReviewTask();
+        FetchReviewTask fetchReviewTask = new FetchReviewTask(getActivity(), rootView);
         fetchReviewTask.execute(id);
 
         //Add the data to the UI

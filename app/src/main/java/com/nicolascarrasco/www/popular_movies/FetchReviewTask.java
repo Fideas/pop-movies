@@ -1,8 +1,14 @@
 package com.nicolascarrasco.www.popular_movies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +29,13 @@ public class FetchReviewTask extends AsyncTask<String, Void, Review[]> {
     private final String API_KEY = "";
     private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
+    private View mRootView;
+    private LayoutInflater mInflater;
+
+    public FetchReviewTask(Context context, View view) {
+        mInflater = LayoutInflater.from(context);
+        mRootView = view;
+    }
 
     @Override
     protected Review[] doInBackground(String... params) {
@@ -101,14 +114,25 @@ public class FetchReviewTask extends AsyncTask<String, Void, Review[]> {
 
     @Override
     protected void onPostExecute(Review[] reviews) {
-        super.onPostExecute(reviews);
+        if (reviews != null) {
+            ViewGroup linearLayout = (LinearLayout) mRootView.findViewById(R.id.review_list_view);
+            for (Review currentReview : reviews) {
+                View reviewView = mInflater.inflate(R.layout.list_item_review, linearLayout, false);
+                TextView authorView = (TextView) reviewView.findViewById(R.id.author_text_view);
+                authorView.setText(currentReview.getAuthor());
+
+                TextView commentView = (TextView) reviewView.findViewById(R.id.comment_text_view);
+                commentView.setText(currentReview.getComment());
+                linearLayout.addView(reviewView);
+            }
+        }
     }
 
     public Review[] getReviewsDataFromJson(String reviewJsonString) throws JSONException {
 
         final String TMDB_RESULT = "results";
         final String TMDB_REVIEW_AUTHOR = "author";
-        final String TMDB_REVIEW_CONTENT = "comment";
+        final String TMDB_REVIEW_CONTENT = "content";
 
         JSONObject reviewJson = new JSONObject(reviewJsonString);
         JSONArray resultArray = reviewJson.getJSONArray(TMDB_RESULT);
