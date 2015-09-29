@@ -51,10 +51,11 @@
                     android:textSize="16sp" />
 
                 <CheckBox
+                    android:id="@+id/favorite_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@android:drawable/btn_star"
-                    android:text="@string/favorite_button_text"/>
+                    android:text="@string/favorite_button_text" />
 
             </LinearLayout>
         </LinearLayout>
