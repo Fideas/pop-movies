@@ -25,8 +25,8 @@ public class MovieGridFragment extends Fragment {
 
     private static final String MOVIES_KEY = "movies_key";
     private static final String LOG_TAG = MovieGridFragment.class.getSimpleName();
-    private static final String SORT_ORDER_KEY = "sort_order" ;
-    ;
+    private static final String SORT_ORDER_KEY = "sort_order";
+
     ImageGridAdapter mMovieAdapter;
     String mSortOrder;
 
@@ -73,18 +73,6 @@ public class MovieGridFragment extends Fragment {
 
                 ((Callback) getActivity()).onItemSelected(movieId, title, synopsis, posterPath,
                         rating, releaseDate);
-
-//                Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                //Add data as extras to the intent
-//                intent.putExtra("id", movieId);
-//                intent.putExtra("title", title);
-//                intent.putExtra("synopsis", synopsis);
-//                intent.putExtra("posterPath", posterPath);
-//                intent.putExtra("userRating", rating);
-//                intent.putExtra("releaseDate", releaseDate);
-//
-//                startActivity(intent);
-
             }
         });
         return rootview;
@@ -119,6 +107,12 @@ public class MovieGridFragment extends Fragment {
 
     }
 
+    public interface Callback {
+
+        void onItemSelected(String movieId, String title, String synopsis, String posterPath,
+                            String userRating, String releaseDate);
+    }
+
     //Adapter for the gridView
     //Code obtained from https://futurestud.io/blog/picasso-adapter-use-for-listview-gridview-etc/
     public class ImageGridAdapter extends ArrayAdapter {
@@ -144,12 +138,12 @@ public class MovieGridFragment extends Fragment {
             //get the movie element
             Movie movie = (Movie) mMovieAdapter.getItem(position);
             try {
-            Picasso
-                    .with(context)
-                    .load(movie.getPosterPath())
-                    .into((ImageView) convertView);
+                Picasso
+                        .with(context)
+                        .load(movie.getPosterPath())
+                        .into((ImageView) convertView);
 
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 Log.e(LOG_TAG, "Malformed/Missing URL", e);
             }
             return convertView;
@@ -162,11 +156,5 @@ public class MovieGridFragment extends Fragment {
         public void setMovieList(ArrayList<Movie> movieArrayList) {
             this.movieList = movieArrayList;
         }
-    }
-
-    public interface Callback {
-
-        public void onItemSelected(String movieId, String title, String synopsis, String posterPath,
-                                   String userRating, String releaseDate);
     }
 }

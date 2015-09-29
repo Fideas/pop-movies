@@ -1,8 +1,8 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,7 +20,6 @@ public class DetailActivity extends AppCompatActivity {
             ;
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
