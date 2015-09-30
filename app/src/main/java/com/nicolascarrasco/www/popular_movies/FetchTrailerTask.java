@@ -30,10 +30,6 @@ import java.net.URL;
  */
 public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
 
-    //insert yout TMDB API key on the next line. For more information please look at the README
-    //on this repository
-    private final String API_KEY = "";
-    private final String KEY_PARAM = "api_key";
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
     private View mRootView;
     private LayoutInflater mInflater;
@@ -47,6 +43,11 @@ public class FetchTrailerTask extends AsyncTask<String, Void, Trailer[]> {
 
     @Override
     protected Trailer[] doInBackground(String... params) {
+
+        //insert your TMDB API key on the next line. For more information please look at the README
+        //on this repository
+        final String API_KEY = "";
+        final String KEY_PARAM = "api_key";
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
