@@ -91,7 +91,7 @@ public class MovieGridFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getSortOrder() != null && getSortOrder() != mSortOrder) {
+        if (getSortOrder() != null && !getSortOrder().equals(mSortOrder)) {
             updateMovieGrid();
         }
     }
