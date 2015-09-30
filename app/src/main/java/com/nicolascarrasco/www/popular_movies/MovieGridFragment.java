@@ -2,6 +2,7 @@ package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -45,7 +47,7 @@ public class MovieGridFragment extends Fragment {
         if (savedInstanceState == null) {
             //Create adapter
             mMovieAdapter = new ImageGridAdapter(getActivity(), new ArrayList<Movie>());
-            Log.v(LOG_TAG, "Entering update throught onCreateView");
+            Log.d(LOG_TAG, "Entering update throught onCreateView");
             updateMovieGrid();
         } else {
             //Restore the sortOrder value from the Bundle
@@ -97,7 +99,12 @@ public class MovieGridFragment extends Fragment {
     public void updateMovieGrid() {
         Log.v(LOG_TAG, "Updating Movies");
         mSortOrder = getSortOrder();
-        new FetchMoviesTask(getActivity(), mMovieAdapter).execute(mSortOrder);
+//        if (mSortOrder.equals(R.string.sort_favorite)) {
+//            //Call a function to retrieve data from the DB instead
+//        } else if (mSortOrder.equals(R.string.sort_popular) ||
+//                mSortOrder.equals(R.string.sort_highest_rated)) {
+            new FetchMoviesTask(getActivity(), mMovieAdapter).execute(mSortOrder);
+//        }
     }
 
     //Helper method to retrieve the current sort order from the Shared Preferences
@@ -152,9 +159,34 @@ public class MovieGridFragment extends Fragment {
         public ArrayList<Movie> getMovieList() {
             return this.movieList;
         }
+    }
 
-        public void setMovieList(ArrayList<Movie> movieArrayList) {
-            this.movieList = movieArrayList;
+    //CursorAdapter used to retrieve data from the DB
+    public class FavoriteMovieAdapter extends CursorAdapter {
+        public FavoriteMovieAdapter(Context context, Cursor cursor, int flags) {
+            super(context, cursor, flags);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.grid_item_movie, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            ImageView posterView = (ImageView) view.findViewById(R.id.grid_item_movie_imageview);
+            String posterPath = cursor.getString(0);
+
+            try {
+                Picasso
+                        .with(context)
+                        .load(posterPath)
+                        .into(posterView);
+
+            } catch (IllegalArgumentException e) {
+                Log.e(LOG_TAG, "Malformed/Missing URL", e);
+            }
+
         }
     }
 }

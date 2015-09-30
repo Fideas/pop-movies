@@ -1,9 +1,12 @@
 package com.nicolascarrasco.www.popular_movies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.nicolascarrasco.www.popular_movies.data.FavoriteMoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,26 +24,42 @@ import java.net.URL;
 // http://docs.themoviedb.apiary.io/
 public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
 
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_POSTER_PATH = 1;
+    static final int COL_MOVIE_TITLE = 2;
+    static final int COL_SYNOPSIS = 3;
+    static final int COL_USER_RATING = 4;
+    static final int COL_RELEASE_DATE = 5;
+    //Indices for the cursor columns
+    private final static String[] DETAIL_COLUMNS = {
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_MOVIE_ID,
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_POSTER_PATH,
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_MOVIE_TITLE,
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_SYNOPSIS,
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_USER_RATING,
+            FavoriteMoviesContract.movieDetailEntry.COLUMN_RELEASE_DATE
+
+    };
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-    private MovieGridFragment.ImageGridAdapter mMovieAdapter;
     private final Context mContext;
+    private MovieGridFragment.ImageGridAdapter mMovieAdapter;
 
-    //insert yout TMDB API key on the next line. For more information please look at the README
-    //on this repository
-    private final String API_KEY = "";
-    private final String KEY_PARAM = "api_key";
-    private final String SORT_PARAM = "sort_by";
-    //Lets weed out movies with high average score but low vote count
-    private final String FILTER_PARAM = "vote_count.gte";
-    private final String FILTER_VALUE = "25";
-
-    public FetchMoviesTask(Context context, MovieGridFragment.ImageGridAdapter imageGridAdapter){
+    public FetchMoviesTask(Context context, MovieGridFragment.ImageGridAdapter imageGridAdapter) {
         mContext = context;
         mMovieAdapter = imageGridAdapter;
     }
 
     @Override
     protected Movie[] doInBackground(String... params) {
+
+        //insert your TMDB API key on the next line. For more information please look at the README
+        //on this repository
+        final String API_KEY = "";
+        final String KEY_PARAM = "api_key";
+        final String SORT_PARAM = "sort_by";
+        //Lets weed out movies with high average score but low vote count
+        final String FILTER_PARAM = "vote_count.gte";
+        final String FILTER_VALUE = "25";
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -51,8 +70,10 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         String sortBy;
 
         //check for the current sort parameter, if none is present use user popularity as default
-        //Also, use the
-        if (params[0].equals(mContext.getString(R.string.sort_highest_rated))) {
+        if (params[0].equals(mContext.getString(R.string.sort_favorite))) {
+            //Call function to request data from DB
+            return getMovieDataFromDb();
+        } else if (params[0].equals(mContext.getString(R.string.sort_highest_rated))) {
             sortBy = "vote_average.desc";
         } else {
             sortBy = "popularity.desc";
@@ -144,8 +165,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
         final String TMDB_RATING = "vote_average";
         final String TMDB_RELEASE = "release_date";
 
-        final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
-        final String POSTER_SIZE_OPTION = "w185/";
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
         JSONArray resultArray = movieJson.getJSONArray(TMDB_RESULT);
@@ -165,12 +184,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
             //Format the release year before saving it
             String releaseDate = formatReleaseDate(movieInfo.getString(TMDB_RELEASE));
 
+            //Format posterPath
+            String posterPath = formatPosterPath(movieInfo.getString(TMDB_POSTER_PATH));
+
             //Set the parameters of the movie
 
-            movie.setPosterPath(POSTER_BASE_URL +
-                    POSTER_SIZE_OPTION +
-                    movieInfo.getString(TMDB_POSTER_PATH));
-
+            movie.setPosterPath(posterPath);
             movie.setId(movieInfo.getString(TMDB_ID));
             movie.setTitle(movieInfo.getString(TMDB_TITLE));
             movie.setSynopsis(movieInfo.getString(TMDB_SYNOPSIS));
@@ -192,4 +211,42 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
     private String formatReleaseDate(String releaseDate) {
         return releaseDate.split("-")[0];
     }
+
+    private String formatPosterPath(String pathFragment) {
+        final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
+        final String POSTER_SIZE_OPTION = "w185/";
+
+        return POSTER_BASE_URL + POSTER_SIZE_OPTION + pathFragment;
+    }
+
+    private Movie[] getMovieDataFromDb() {
+        Uri uri = FavoriteMoviesContract.movieDetailEntry.CONTENT_URI;
+        Cursor movieCursor = mContext.getContentResolver().query(
+                uri,
+                DETAIL_COLUMNS,
+                FavoriteMoviesContract.movieDetailEntry.COLUMN_FAVORITE + " = ? ",
+                new String[]{"1"},
+                null
+        );
+        Movie[] moviesArray = new Movie[movieCursor.getCount()];
+        for (int i = 0; i < movieCursor.getCount(); ++i) {
+            Movie currentMovie = new Movie();
+            movieCursor.moveToNext();
+            String posterPath = formatPosterPath(movieCursor.getString(COL_POSTER_PATH));
+           // String userRating =  formatUserRating(movieCursor.getString(COL_USER_RATING));
+           // String releaseDate = formatReleaseDate(movieCursor.getString(COL_RELEASE_DATE));
+
+            currentMovie.setPosterPath(posterPath);
+            currentMovie.setId(movieCursor.getString(COL_MOVIE_ID));
+            currentMovie.setTitle(movieCursor.getString(COL_MOVIE_TITLE));
+            currentMovie.setSynopsis(movieCursor.getString(COL_SYNOPSIS));
+            currentMovie.setUserRating(movieCursor.getString(COL_USER_RATING));
+            currentMovie.setReleaseDate(movieCursor.getString(COL_RELEASE_DATE));
+
+            //Add the movie data to the result array
+            moviesArray[i] = currentMovie;
+        }
+        return moviesArray;
+    }
+
 }
