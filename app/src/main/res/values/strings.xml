@@ -14,6 +14,8 @@
     <string name="sort_popular" translatable="false">popular</string>
     <string name="sort_highest_rated_label">Highest rated</string>
     <string name="sort_highest_rated" translatable="false">highestRated</string>
+    <string name="sort_favorite_label">Favorite</string>
+    <string name="sort_favorite" translatable="false">favorite</string>
 
 
 </resources>
